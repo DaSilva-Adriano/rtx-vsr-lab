@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vsr-lab"
+version = "1.0.0"
+description = "RTX VSR Lab — offline NVIDIA RTX Video Super Resolution"
+requires-python = ">=3.10"
+readme = "README.md"
+
+[project.scripts]
+vsr_lab = "vsr_lab.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["vsr_lab*"]
+
+[tool.setuptools.package-data]
+vsr_lab = ["_vsr_ngx.dll"]

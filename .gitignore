@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+*.obj
+*.exp
+*.lib
+*.pdb
+vsr_lab/_vsr_ngx.exp
+vsr_lab/_vsr_ngx.lib
+native/x64/
+*.user
+.venv/
+
+# NVIDIA feature DLLs must not be redistributed
+nvngx_vsr.dll
+nvngx_truehdr.dll
