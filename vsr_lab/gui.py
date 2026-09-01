@@ -44,6 +44,7 @@ class App(tk.Tk):
         self.var_q = tk.IntVar(value=4)
         self.var_thdr = tk.BooleanVar(value=False)
         self.var_stretch = tk.BooleanVar(value=False)
+        self.var_keep = tk.BooleanVar(value=True)
         self.var_fallback = tk.BooleanVar(value=False)
         self.var_crf = tk.IntVar(value=12)
 
@@ -133,7 +134,16 @@ class App(tk.Tk):
         ttk.Label(opt, text="CRF").pack(side=tk.LEFT, padx=(16, 0))
         ttk.Spinbox(opt, from_=0, to=28, textvariable=self.var_crf, width=4).pack(side=tk.LEFT, padx=8)
         ttk.Checkbutton(opt, text="TrueHDR (default OFF)", variable=self.var_thdr).pack(side=tk.LEFT, padx=12)
-        ttk.Checkbutton(opt, text="Stretch (ignore aspect ratio)", variable=self.var_stretch).pack(side=tk.LEFT)
+        ttk.Checkbutton(
+            opt, text="Stretch (fill canvas)", variable=self.var_stretch, command=self._on_stretch
+        ).pack(side=tk.LEFT)
+
+        ttk.Checkbutton(
+            top,
+            text="Keep picture aspect — detect film letterbox/pillarbox inside the frame (default ON)",
+            variable=self.var_keep,
+            command=self._on_keep,
+        ).pack(anchor="w", padx=10)
 
         ttk.Checkbutton(
             top,
@@ -154,6 +164,14 @@ class App(tk.Tk):
         self.caps.delete("1.0", tk.END)
         self.caps.insert("1.0", text)
         self.caps.configure(state=tk.DISABLED)
+
+    def _on_keep(self) -> None:
+        if self.var_keep.get():
+            self.var_stretch.set(False)
+
+    def _on_stretch(self) -> None:
+        if self.var_stretch.get():
+            self.var_keep.set(False)
 
     def _on_preset(self) -> None:
         v = self.var_preset.get()
@@ -278,6 +296,7 @@ class App(tk.Tk):
             stretch=bool(self.var_stretch.get()),
             fallback=fallback,
             crf=int(self.var_crf.get()),
+            keep_picture_aspect=bool(self.var_keep.get()),
             out_dir=out_dir,
         )
         self.running = True

@@ -28,7 +28,12 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--no-thdr", action="store_true", default=False, help="disable TrueHDR (default)")
     p.add_argument("--thdr", action="store_true", default=False, help="enable TrueHDR")
     p.add_argument("--crf", type=int, default=12)
-    p.add_argument("--stretch", action="store_true", help="ignore aspect ratio")
+    p.add_argument("--stretch", action="store_true", help="ignore aspect ratio (fills the canvas; stretches film)")
+    p.add_argument(
+        "--no-detect-bars",
+        action="store_true",
+        help="do not detect baked-in letterbox/pillarbox (default: detect and keep picture aspect)",
+    )
     p.add_argument(
         "--fallback",
         action="store_true",
@@ -100,6 +105,7 @@ def main(argv: list[str] | None = None) -> int:
         stretch=bool(args.stretch),
         fallback=fallback,
         crf=int(args.crf),
+        keep_picture_aspect=not bool(args.no_detect_bars),
     )
     try:
         path = run_job(engine, job, log=print)

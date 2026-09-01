@@ -68,6 +68,15 @@ def reject_source(w: int, h: int) -> str | None:
     return None
 
 
+def display_dims(w: int, h: int, sar_n: int = 1, sar_d: int = 1) -> tuple[int, int]:
+    """Coded size → square-pixel display size using sample aspect ratio."""
+    n = sar_n if sar_n > 0 else 1
+    d = sar_d if sar_d > 0 else 1
+    if n == d:
+        return int(w), int(h)
+    return max(1, int(round(w * n / d))), int(h)
+
+
 def would_downscale(src_w: int, src_h: int, dst_w: int, dst_h: int, stretch: bool) -> bool:
     if stretch:
         return dst_w < src_w or dst_h < src_h
