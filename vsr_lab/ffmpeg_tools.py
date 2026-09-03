@@ -251,6 +251,14 @@ def _grab_rgba_frame(path: Path, seconds: float, w: int, h: int) -> bytes | None
     return None
 
 
+def _matte_pair(a: int, b: int) -> bool:
+    """Opposite-edge bars that look like a film matte, not a one-sided dark scene."""
+    if a < 8 or b < 8:
+        return False
+    lo, hi = (a, b) if a <= b else (b, a)
+    return lo * 2 >= hi
+
+
 def _clamp_rect(x: int, y: int, w: int, h: int, frame_w: int, frame_h: int) -> ActiveRect:
     full = ActiveRect(0, 0, frame_w, frame_h, frame_w, frame_h)
     x = max(0, _even_down(x))
@@ -267,6 +275,19 @@ def _clamp_rect(x: int, y: int, w: int, h: int, frame_w: int, frame_h: int) -> A
         return full
     if (frame_w - w) < 8 and (frame_h - h) < 8:
         return full
+    left, top = x, y
+    right = frame_w - x - w
+    bot = frame_h - y - h
+    letter = _matte_pair(top, bot)
+    pillar = _matte_pair(left, right)
+    # cropdetect hugs any dark region. A studio backdrop or night sky on one
+    # side is picture, not a letterbox/pillarbox. Keep only paired opposite edges.
+    if not letter and not pillar:
+        return full
+    if not letter:
+        y, h = 0, frame_h
+    if not pillar:
+        x, w = 0, frame_w
     return ActiveRect(x, y, w, h, frame_w, frame_h)
 
 
@@ -279,7 +300,8 @@ def detect_active_picture(
     """Find baked-in letterbox/pillarbox.
 
     Real film mattes are often TV-range / grainy, not RGB 0. Scan sampled frames for
-    flat dark rows/columns and take the median matte. cropdetect is a fallback only.
+    flat dark rows/columns on opposite edges and take the median matte. cropdetect
+    is last-resort only (it crops any dark scene, e.g. a studio backdrop).
     """
     path = Path(path)
     full = ActiveRect(0, 0, frame_w, frame_h, frame_w, frame_h)
@@ -317,9 +339,9 @@ def detect_active_picture(
         left = _even_down(_median_int(lefts))
         right = _even_down(_median_int(rights))
         # Film mattes sit on both opposite edges. A single dark edge is usually picture.
-        if top < 8 or bot < 8:
+        if not _matte_pair(top, bot):
             top = bot = 0
-        if left < 8 or right < 8:
+        if not _matte_pair(left, right):
             left = right = 0
         score = top + bot + left + right
         if score > sum(best):
@@ -330,7 +352,9 @@ def detect_active_picture(
 
     top, bot, left, right = best
     if top < 8 and bot < 8 and left < 8 and right < 8:
-        return _detect_cropdetect(path, frame_w, frame_h)
+        # RGBA already scanned the frames. Do not ask cropdetect: it treats a
+        # dark scene (studio backdrop, night sky) as a matte and crops content.
+        return full
     return _clamp_rect(left, top, frame_w - left - right, frame_h - top - bot, frame_w, frame_h)
 
 
