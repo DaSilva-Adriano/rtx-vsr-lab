@@ -7,7 +7,7 @@ Windows GUI and CLI. Quality 1–4 matches the NVIDIA App scale. Output is cappe
 ## Requirements
 
 - Windows 10/11 x64
-- NVIDIA GPU that supports RTX Video Super Resolution (typically RTX 30/40/50)
+- NVIDIA GPU that supports RTX Video Super Resolution (RTX 20/30/40/50)
 - A current Game Ready or Studio driver
 - Python 3.10 or newer
 - FFmpeg and ffprobe with `libx265` (looked up in `C:\VSR\ffmpeg-9.0.1-full_build\bin`, then `PATH`)
