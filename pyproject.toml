@@ -8,6 +8,8 @@ version = "1.0.0"
 description = "RTX VSR Lab — offline NVIDIA RTX Video Super Resolution"
 requires-python = ">=3.10"
 readme = "README.md"
+license = { file = "LICENSE" }
+keywords = ["nvidia", "rtx", "vsr", "super-resolution", "video"]
 
 [project.scripts]
 vsr_lab = "vsr_lab.cli:main"

@@ -287,7 +287,7 @@ class App(tk.Tk):
         )
         ttk.Label(
             top,
-            text="Offline RTX Video Super Resolution via nvngx_vsr.dll / SDK 1.1. Not RTXVideoProcessor.exe.",
+            text="Offline RTX Video Super Resolution via NVIDIA RTX Video SDK 1.1.",
             foreground=MUTED,
         ).pack(anchor="w", padx=10)
 
